@@ -21,7 +21,7 @@ graph TD
     Webhook --> Extract["Extract from File (Arabic Normalizer)"]
     Extract --> DB_Log["Supabase PostgreSQL (Audit Session Row)"]
     Extract --> Agent["Maat AI Agent (GPT-4o)"]
-    Agent <-->|Vector RAG Search| VectorStore["Supabase pgvector (Official Laws 151/816/175)"]
+    Agent -->|Vector RAG Search| VectorStore["Supabase pgvector (Official Laws 151/816/175)"]
     Agent --> MathEngine["JavaScript Deterministic Engine (Math Scoring & Fines)"]
     MathEngine --> Render["Render Report (RTL Arabic HTML Engine)"]
     Render --> Delivery["Gmail API & Instant Webhook Response"]
