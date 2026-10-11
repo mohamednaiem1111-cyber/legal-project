@@ -58,8 +58,7 @@ sequenceDiagram
 ### 1. End-to-End User Flow & Incident Response
 The diagram below illustrates the complete platform lifecycle, including dual-intake processing, iterative remediation loops, and the dedicated 72-hour emergency breach protocol:
 
-[docs/ui-ux/user_flowchart.png]
-
+<img src="docs/ui-ux/user_flowchart.png" width="100%" />
 ---
 
 ### 2. Core System Wireframes & Design System
