@@ -50,3 +50,23 @@ sequenceDiagram
     n8n->>Web: 200 OK (HTML Report & Dashboard Data)
     n8n->>User: Dispatch Gmail Full Executive Report
 ```
+
+---
+
+## 🎨 UI/UX Architecture & User Journey
+
+### 1. End-to-End User Flow & Incident Response
+The diagram below illustrates the complete platform lifecycle, including dual-intake processing, iterative remediation loops, and the dedicated 72-hour emergency breach protocol:
+
+[docs/ui-ux/user_flowchart.png]
+
+---
+
+### 2. Core System Wireframes & Design System
+- **Screen 1 — Landing Page:** Regulatory countdown banner (Law 151/2020 & Exec Reg 816/2025) and core mission overview.
+- **Screen 2 — Dual Audit Intake & AI War Room:** File upload (PDF) vs live domain audit (URL) with SSRF safeguards, live pipeline stages, and Risk Radar.
+- **Screen 3 — Audit Results & Regulatory Action:** Real statutory penalty ranges (Law 151 & Law 175 Art. 33), Art. 49 pre-trial conciliation calculator (50% statutory reduction), and emergency breach alert.
+- **Screen 4 — UX Journey & Design System:** Multi-tier remediation loop and enterprise color palette (Navy `#142C3B`, Gold `#CDA963`, Success `#377E5B`).
+
+* 📄 **Static Documentation:** [View Full Wireframes PDF](docs/ui-ux/wireframes_system.pdf)
+* 🔗 **Interactive Prototype:** [Explore Live Design on Canva](https://canva.link/c6m2pclgmjk4wc1)
