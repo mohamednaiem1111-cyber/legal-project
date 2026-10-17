@@ -76,3 +76,8 @@ export async function listMyAudits() {
     .order('created_at', { ascending: false })
     .limit(50);
 }
+
+// Right to erasure: RLS only lets a user delete his own rows; the filter is required by PostgREST.
+export async function deleteMyAudits() {
+  return supabase().from('compliance_audits').delete().not('id', 'is', null);
+}

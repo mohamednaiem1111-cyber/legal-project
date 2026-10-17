@@ -148,7 +148,8 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--gold); outl
 .paper .alert.ok { background: #e8f5ee; border-color: #b9e0c9; }
 
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th { background: var(--th-bg); color: var(--th-ink); font-weight: 600; text-align: right; padding: 10px; }
+th { background: var(--th-bg); color: var(--th-ink); font-weight: 600; text-align: start; padding: 10px; }
+td { text-align: start; }
 td { border-bottom: 1px solid var(--line); padding: 10px; vertical-align: top; }
 tr.click { cursor: pointer; }
 tr.click:hover td { background: var(--card-2); }

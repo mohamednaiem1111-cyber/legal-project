@@ -32,7 +32,20 @@ if (text.length < MIN_CHARS) {
 }
 
 const originalLength = text.length;
+
+// Privacy: mask personal identifiers BEFORE the text reaches the AI. A privacy policy rarely needs them,
+// and the scorer verifies quotes against this same masked text, so results stay consistent.
+const D = '[0-9٠-٩۰-۹]';
+const asciiDigits = (s) => s.replace(/[٠-٩]/g, (c) => String(c.charCodeAt(0) - 0x0660)).replace(/[۰-۹]/g, (c) => String(c.charCodeAt(0) - 0x06F0)).replace(/\D/g, '');
+const luhn = (digits) => { let sum = 0, alt = false; for (let i = digits.length - 1; i >= 0; i--) { let n = digits.charCodeAt(i) - 48; if (alt) { n *= 2; if (n > 9) n -= 9; } sum += n; alt = !alt; } return sum % 10 === 0; };
+let piiMasked = 0;
+const mask = (tag, re, accept) => { text = text.replace(re, (m) => { if (accept && !accept(m)) return m; piiMasked++; return `[${tag}]`; }); };
+mask('EMAIL', /[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}/gi);
+mask('NATIONAL_ID', new RegExp(`(?<!${D})[23٢٣]${D}{13}(?!${D})`, 'g'));
+mask('PHONE', new RegExp(`(?<!${D})(?:\\+?20[\\s\\-]?|0)?1[0125](?:[\\s\\-]?${D}){8}(?!${D})`, 'g'));
+mask('CARD', new RegExp(`(?<!${D})(?:${D}[ \\-]?){13,19}(?!${D})`, 'g'), (m) => { const d = asciiDigits(m); return d.length >= 13 && d.length <= 19 && luhn(d); });
+
 const truncated = text.length > MAX_AI_CHARS;
 if (truncated) text = text.slice(0, MAX_AI_CHARS);
 
-return [{ json: { early: false, policy_text_for_ai: text, truncated, original_length: originalLength } }];
+return [{ json: { early: false, policy_text_for_ai: text, truncated, original_length: originalLength, pii_masked: piiMasked } }];

@@ -43,6 +43,8 @@ Key design rules:
 | `tests/` | 67 workflow tests + 20 API-gate tests |
 | `scripts/sync-n8n.mjs` | Copies `n8n/src` into `Maat_v2.json` (`npm run sync:n8n`) |
 
+This is a **prototype on free services, by design**. What is already closed, what is deferred to a paid production setup, and the statement for judges: [`docs/PRODUCTION-ROADMAP.md`](./docs/PRODUCTION-ROADMAP.md).
+
 Local run: `npm install`, create `.env.local` from `.env.example`, `npm run dev` (http://localhost:3000). Full check before any push: `npm run check`.
 
 > The diagrams below are the original Milestone 2 design (OpenAI GPT-4o, Lovable UI, Gmail delivery) and are kept for the project record. The v2 implementation above uses Gemini and a Next.js front end, and does not send Gmail.

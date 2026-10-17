@@ -6,7 +6,8 @@ import fs from 'node:fs';
 const root = new URL('../n8n/', import.meta.url);
 const wfPath = new URL('Maat_v2.json', root);
 const wf = JSON.parse(fs.readFileSync(wfPath, 'utf8'));
-const src = (f) => fs.readFileSync(new URL('src/' + f, root), 'utf8');
+// Always LF inside the workflow JSON, even when git checked the files out with CRLF (Windows).
+const src = (f) => fs.readFileSync(new URL('src/' + f, root), 'utf8').replace(/\r\n/g, '\n');
 const matrix = JSON.parse(src('matrix.json'));
 
 const MAP = {

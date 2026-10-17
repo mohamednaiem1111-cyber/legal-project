@@ -44,6 +44,13 @@ create policy "audits_select_own" on public.compliance_audits
 revoke insert, update, delete on public.compliance_audits from anon, authenticated;
 revoke all on public.compliance_audits from anon;
 
+-- Right to erasure: a user may delete his OWN audit summaries (and nobody else's).
+grant delete on public.compliance_audits to authenticated;
+drop policy if exists "audits_delete_own" on public.compliance_audits;
+create policy "audits_delete_own" on public.compliance_audits
+  for delete to authenticated
+  using (user_id = (select auth.uid()));
+
 -- Privacy: old rows may contain full HTML reports (policy quotes). Uncomment to wipe them.
 -- update public.compliance_audits set report_html = null, policy_filename = null;
 
