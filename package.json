@@ -1,0 +1,29 @@
+{
+  "name": "maat-web",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node tests/n8n.test.mjs",
+    "test:proxy": "npx -y deno@2.9.6 test --no-check tests/proxy.test.ts",
+    "sync:n8n": "node scripts/sync-n8n.mjs",
+    "check": "npm run sync:n8n && npm test && npm run build"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.2",
+    "next": "16.3.7",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
