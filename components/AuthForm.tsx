@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import Logo from './Logo';
 
 const AR_ERRORS: Record<string, string> = {
   'Invalid login credentials': 'البريد أو كلمة المرور غير صحيحة.',
@@ -8,7 +9,7 @@ const AR_ERRORS: Record<string, string> = {
   'User already registered': 'البريد مسجل بالفعل. سجّل الدخول.',
 };
 
-export default function AuthForm() {
+export default function AuthForm({ onBack }: { onBack?: () => void }) {
   const [mode, setMode] = useState<'in' | 'up'>('in');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,7 +33,8 @@ export default function AuthForm() {
   return (
     <div className="auth">
       <div className="center" style={{ marginBottom: 20 }}>
-        <h1>⚖ MA&apos;At AI</h1>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}><Logo size={64} /></div>
+        <h1>MA&apos;At AI</h1>
         <p style={{ color: 'var(--muted)' }}>فحص امتثال سياسات الخصوصية لقانون 151 لسنة 2020</p>
       </div>
       <div className="card">
@@ -51,11 +53,12 @@ export default function AuthForm() {
             <input id="pw" type="password" required minLength={8} autoComplete={mode === 'in' ? 'current-password' : 'new-password'}
               value={password} onChange={(e) => setPassword(e.target.value)} dir="ltr" />
           </div>
-          <button className="btn" style={{ width: '100%' }} disabled={busy}>
+          <button className="btn block" disabled={busy}>
             {busy ? <span className="spin" /> : mode === 'in' ? 'دخول' : 'إنشاء الحساب'}
           </button>
         </form>
       </div>
+      {onBack && <p className="center" style={{ marginTop: 14 }}><button type="button" className="btn ghost small" onClick={onBack}>العودة للصفحة الرئيسية</button></p>}
     </div>
   );
 }

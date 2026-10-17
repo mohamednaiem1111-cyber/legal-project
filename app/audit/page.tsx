@@ -1,9 +1,15 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { runAudit, isError, MAX_PDF_BYTES, type Json } from '@/lib/api';
 import AuditResult from '@/components/AuditResult';
+import { IconScan, IconDoc, IconRadar, IconList } from '@/components/Icons';
 
-const STAGES = ['تحليل المستند', 'استخراج البيانات', 'تقييم المخاطر', 'الملخص التنفيذي'];
+const STAGES = [
+  { title: 'تحليل المستند', text: 'قراءة النص وتجهيزه للفحص', icon: <IconScan size={18} /> },
+  { title: 'استخراج البيانات', text: 'تحديد الأغراض وفئات البيانات والأسانيد', icon: <IconDoc size={18} /> },
+  { title: 'تقييم المخاطر', text: 'تصنيف البنود مقابل القانون واللائحة', icon: <IconRadar size={18} /> },
+  { title: 'الملخص التنفيذي', text: 'حساب الدرجة والغرامات وتجهيز التقرير', icon: <IconList size={18} /> },
+];
 
 export default function AuditPage() {
   const [mode, setMode] = useState<'pdf' | 'text'>('pdf');
@@ -16,14 +22,17 @@ export default function AuditPage() {
   const [stage, setStage] = useState(0);
   const [error, setError] = useState('');
   const [result, setResult] = useState<Json | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   // cosmetic progress while waiting (the real work happens on the server)
   useEffect(() => {
     if (!busy) return;
     setStage(0);
-    const t = setInterval(() => setStage((s) => Math.min(s + 1, STAGES.length - 1)), 12000);
+    const t = setInterval(() => setStage((s) => Math.min(s + 1, STAGES.length - 1)), 4000);
     return () => clearInterval(t);
   }, [busy]);
+
+  useEffect(() => { if (result) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, [result]);
 
   function pickFile(f: File | null) {
     setError('');
@@ -53,56 +62,81 @@ export default function AuditPage() {
     setResult(r);
   }
 
+  const nodeState = (i: number) => (result ? 'done' : busy ? (i < stage ? 'done' : i === stage ? 'run' : '') : '');
+  const stateLabel = (s: string) => (s === 'done' ? 'اكتملت' : s === 'run' ? 'جارٍ التنفيذ' : 'في الانتظار');
+
   return (
     <div className="stack">
       <div className="head">
         <div>
-          <h1>غرفة التدقيق الذكي</h1>
-          <p>الفحص بياخد من دقيقة لدقيقتين. متقفلش الصفحة.</p>
+          <div className="eyebrow">مساحة العمل / غرفة العمليات</div>
+          <h1>لوحة غرفة عمليات الذكاء الاصطناعي</h1>
+          <p>من الأدلة المعقدة إلى قرارات واضحة. الفحص يأخذ من 10 ثوانٍ إلى دقيقتين، فلا تقفل الصفحة.</p>
         </div>
       </div>
 
-      <form className="card" onSubmit={submit}>
-        <div className="field">
-          <label htmlFor="company">اسم الشركة</label>
-          <input id="company" type="text" maxLength={120} value={company} onChange={(e) => setCompany(e.target.value)} />
-        </div>
-
-        <div className="tabs">
-          <button type="button" className={mode === 'pdf' ? 'on' : ''} onClick={() => setMode('pdf')}>01 رفع PDF</button>
-          <button type="button" className={mode === 'text' ? 'on' : ''} onClick={() => setMode('text')}>02 لصق النص</button>
-        </div>
-
-        {mode === 'pdf' ? (
+      <div className="ops">
+        <form className="card" onSubmit={submit}>
           <div className="field">
-            <label htmlFor="file">ملف سياسة الخصوصية</label>
-            <input id="file" type="file" accept="application/pdf,.pdf" onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
-            <div className="hint">PDF نصي (مش صورة ممسوحة)، حتى 4 ميجابايت.</div>
+            <label htmlFor="company">اسم الشركة</label>
+            <input id="company" type="text" maxLength={120} value={company} onChange={(e) => setCompany(e.target.value)} />
           </div>
-        ) : (
+
+          <div className="tabs">
+            <button type="button" className={mode === 'pdf' ? 'on' : ''} onClick={() => setMode('pdf')}>01 رفع PDF</button>
+            <button type="button" className={mode === 'text' ? 'on' : ''} onClick={() => setMode('text')}>02 لصق النص</button>
+          </div>
+
+          {mode === 'pdf' ? (
+            <div className="field">
+              <label htmlFor="file">ملف سياسة الخصوصية</label>
+              <input id="file" type="file" accept="application/pdf,.pdf" onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
+              <div className="hint">PDF نصي (مش صورة ممسوحة)، حتى 4 ميجابايت.</div>
+            </div>
+          ) : (
+            <div className="field">
+              <label htmlFor="text">نص سياسة الخصوصية</label>
+              <textarea id="text" maxLength={120000} value={text} onChange={(e) => setText(e.target.value)} />
+              <div className="hint">{text.length.toLocaleString('en-US')} / 120,000 حرف</div>
+            </div>
+          )}
+
           <div className="field">
-            <label htmlFor="text">نص سياسة الخصوصية</label>
-            <textarea id="text" maxLength={120000} value={text} onChange={(e) => setText(e.target.value)} />
-            <div className="hint">{text.length.toLocaleString('en-US')} / 120,000 حرف</div>
+            <label className="check"><input type="checkbox" checked={isSP} onChange={(e) => setIsSP(e.target.checked)} /> الجهة مقدّم خدمة اتصالات أو إنترنت (يفعّل بند القانون 175)</label>
+            <label className="check"><input type="checkbox" checked={isForeign} onChange={(e) => setIsForeign(e.target.checked)} /> الجهة أجنبية</label>
           </div>
-        )}
 
-        <div className="field">
-          <label className="check"><input type="checkbox" checked={isSP} onChange={(e) => setIsSP(e.target.checked)} /> الجهة مقدّم خدمة اتصالات أو إنترنت (يفعّل بند القانون 175)</label>
-          <label className="check"><input type="checkbox" checked={isForeign} onChange={(e) => setIsForeign(e.target.checked)} /> الجهة أجنبية</label>
+          {error && <div className="alert err">{error}</div>}
+          <button className="btn block" disabled={busy}>{busy ? <>جارٍ التحليل <span className="spin" /></> : 'بدء عملية الذكاء الاصطناعي'}</button>
+        </form>
+
+        <div className="pipeline" aria-live="polite">
+          <div className="pipeline-head">
+            <span>MA&apos;At / 01 · خط المعالجة</span>
+            <span className="live">{busy ? 'جارٍ العمل' : result ? 'اكتمل' : 'جاهز للاستكشاف'}</span>
+          </div>
+          <div className="nodes">
+            {STAGES.map((s, i) => {
+              const st = nodeState(i);
+              return (
+                <div key={s.title} className={`node ${st}`}>
+                  <div className="no">0{i + 1}</div>
+                  <h3>{s.icon}{s.title}</h3>
+                  <p>{s.text}</p>
+                  <div className="state"><span className="dot" />{stateLabel(st)}</div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="pipeline-foot">التقدّم المعروض تقريبي؛ المعالجة الفعلية تتم على الخادم.</div>
         </div>
+      </div>
 
-        {error && <div className="alert err">{error}</div>}
-        <button className="btn" disabled={busy}>{busy ? <>جارٍ التحليل <span className="spin" /></> : 'ابدأ الفحص'}</button>
-
-        {busy && (
-          <div className="steps">
-            {STAGES.map((s, i) => <div key={s} className={`step ${i <= stage ? 'on' : ''}`}>{i + 1}. {s}</div>)}
-          </div>
-        )}
-      </form>
-
-      {result && <AuditResult r={result} company={company} />}
+      {result && (
+        <div ref={resultRef} className="paper">
+          <AuditResult r={result} company={company} />
+        </div>
+      )}
     </div>
   );
 }

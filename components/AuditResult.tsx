@@ -22,6 +22,10 @@ export default function AuditResult({ r, company }: { r: Json; company: string }
 
   return (
     <div className="stack">
+      <div>
+        <div className="eyebrow">نتائج التدقيق والتقارير الرقابية</div>
+        <h2 style={{ fontSize: 24 }}>نتيجة تدقيق: {company || 'الشركة'}</h2>
+      </div>
       {r.legal_review_status === 'PENDING_LAWYER_REVIEW' && (
         <div className="alert warn">نتيجة استرشادية: المصفوفة القانونية لم تُعتمد من المحامي بعد.</div>
       )}
